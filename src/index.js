@@ -5,6 +5,7 @@ const database = require('./db/dbConnection')
 const User = require('./db/userModel')
 const routers = require('./routes')
 
+
 app.use(express.json())
 app.use(routers)
 

@@ -25,7 +25,7 @@ async function createUser(req,res){
     })
 
 
-    return res.send('ok')
+    return res.status(201).send('ok')
 }
 
 async function login(req, res){
@@ -35,7 +35,7 @@ async function login(req, res){
         email: email
     }})
 
-    if(verifyEmail == 0){
+    if(!verifyEmail){
         return res.status(400).send('Email or password incorrect')
     }
 
@@ -54,7 +54,7 @@ async function profile(req,res) {
     const { authorization } = req.headers
     
     if(!authorization) {
-        res.status(401).send('logged out user')
+        return res.status(401).send('logged out user')
     }
 
     const token = authorization.split(" ")
@@ -62,7 +62,7 @@ async function profile(req,res) {
 
     JWT.verify(token[1], JWT_PASSWORD, (erro, decoded) => {
         if (erro) {
-            return res.status(403).json({ mensagem: "Invalid Token" });
+            return res.status(403).send("Invalid Token");
         }
 
         return req.user = decoded.id
@@ -76,7 +76,7 @@ async function profile(req,res) {
         id: req.user 
     }})
 
-    return res.json(User)
+    return res.status(200).json({user: User})
 }
 
 async function updateProfile(req, res){
@@ -84,14 +84,14 @@ async function updateProfile(req, res){
     const {authorization} = req.headers
 
     if(!authorization) {
-        res.send('logged out user')
+        return res.send('logged out user')
     }
 
     const token = authorization.split(" ")
 
     JWT.verify(token[1], JWT_PASSWORD, (erro, decoded) => {
         if (erro) {
-            return res.status(403).json({ mensagem: "Invalid Token" });
+            return res.status(403).send("Invalid Token");
         }
 
         return req.user = decoded.id
@@ -100,13 +100,14 @@ async function updateProfile(req, res){
     if(!req.user){
         return;
     }
+
     const User = await userSequelize.findOne({ where: {
         id: req.user
     }})
 
     
     if(!nome && !email && !password){
-        res.send('Not changes')
+        return res.send('Not changes')
     }
 
     if(nome){
@@ -131,14 +132,14 @@ async function deleteUser(req, res){
     const {authorization} = req.headers
 
     if(!authorization) {
-        res.send('logged out user')
+        return res.send('logged out user')
     }
 
     const token = authorization.split(" ")
 
     JWT.verify(token[1], JWT_PASSWORD, (erro, decoded) => {
         if (erro) {
-            return res.status(403).json({ mensagem: "Invalid Token" });
+            return res.status(403).send("Invalid Token");
         }
 
         return req.user = decoded.id
@@ -147,6 +148,7 @@ async function deleteUser(req, res){
     if(!req.user){
         return;
     }
+
     const User = await userSequelize.findOne({ where: {
         id: req.user
     }})
